@@ -4,17 +4,7 @@ import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Replace the JSON import with this object
-//**
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "budgetquest-e2e34.firebaseapp.com",
-  projectId: "budgetquest-e2e34",
-  storageBucket: "budgetquest-e2e34.firebasestorage.app",
-  messagingSenderId: "29982819286",
-  appId: "1:29982819286:web:9c837d89ac8a586ea8da77",
-  measurementId: "G-9SMD8B5ZJY"
-};
-**//
+
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
