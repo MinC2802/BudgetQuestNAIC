@@ -1,7 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence, doc, getDocFromServer } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+const firebaseConfig = {
+  // Use import.meta.env for Vite projects
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: "budgetquest-e2e34.firebaseapp.com",
+  projectId: "budgetquest-e2e34",
+  storageBucket: "budgetquest-e2e34.firebasestorage.app",
+  messagingSenderId: "29982819286",
+  appId: "1:29982819286:web:9c837d89ac8a586ea8da77",
+  measurementId: "G-9SMD8B5ZJY"
+};
+
+// Replace the JSON import with this object
+
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
