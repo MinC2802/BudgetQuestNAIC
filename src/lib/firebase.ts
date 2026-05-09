@@ -1,7 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+const firebaseConfig = {
+  apiKey: "AIzaSyDULHnY-ApbxFVVZMpB0188pJgHpvXQ0Kc",
+  authDomain: "budgetquest-e2e34.firebaseapp.com",
+  projectId: "budgetquest-e2e34",
+  storageBucket: "budgetquest-e2e34.firebasestorage.app",
+  messagingSenderId: "29982819286",
+  appId: "1:29982819286:web:9c837d89ac8a586ea8da77",
+  measurementId: "G-9SMD8B5ZJY"
+};
 
 // Replace the JSON import with this object
 
