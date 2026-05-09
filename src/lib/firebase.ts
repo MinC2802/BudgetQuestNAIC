@@ -2,6 +2,9 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import.meta.env.VITE_FIREBASE_API_KEY
+console.log("Check 1 (Next):", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+console.log("Check 2 (Vite):", import.meta.env?.VITE_FIREBASE_API_KEY);
+console.log("Check 3 (All Env):", process.env);
 console.log("Checking API Key:", meta.env.VITE_FIREBASE_API_KEY);
 const firebaseConfig = {
   apiKey:meta.env.VITE_FIREBASE_API_KEY,
