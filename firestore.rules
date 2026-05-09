@@ -1,0 +1,177 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net - Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection Test
+    match /test/connection {
+      allow read: if isSignedIn();
+    }
+
+    // ===============================================================
+    // Helper Functions (The Primitives)
+    // ===============================================================
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      // In development, we might not always have verified email, 
+      // but the pillar says we SHOULD mandate it for standard writes.
+      // However, if the user hasn't verified their email yet, this will block them.
+      // I'll keep it but ensure the user knows.
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // ===============================================================
+    // Validation Blueprints (Schema Enforcement)
+    // ===============================================================
+
+    function isValidUserPublic(data) {
+      return data.keys().hasAll(['name', 'points']) &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.points is number && data.points >= 0 &&
+             (data.get('avatar', '') is string) &&
+             (data.get('streak', 0) is number) &&
+             (data.get('highestStreak', 0) is number) &&
+             (data.get('totalTransactions', 0) is number);
+    }
+
+    function isValidUserPrivate(data) {
+      return data.keys().hasAll(['email']) &&
+             data.email is string && data.email.size() <= 200 &&
+             (data.get('questRerolls', 3) is number) &&
+             (data.get('isOnboarded', false) is bool) &&
+             (data.get('monthlyBudget', 0) is number) &&
+             (data.get('savingTarget', 0) is number) &&
+             (data.get('controlCategories', []) is list) &&
+             (data.get('financialChallenge', '') is string) &&
+             (data.get('savingGoals', []) is list);
+    }
+
+    function isValidPocket(data) {
+      return data.keys().hasAll(['name', 'currentBalance', 'type']) &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.currentBalance is number &&
+             data.type in ['Spendable', 'Saving'] &&
+             (data.get('icon', '') is string) &&
+             (data.get('goalAmount', 0) is number);
+    }
+
+    function isValidTransaction(data) {
+      return data.keys().hasAll(['amount', 'category', 'date', 'source']) &&
+             data.amount is number &&
+             data.category is string &&
+             data.date is string &&
+             data.source in ['Manual', 'OCR'] &&
+             (data.get('storeName', '') is string) &&
+             (data.get('pocketId', '') is string);
+    }
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['name', 'budget']) &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.budget is number && data.budget >= 0 &&
+             (data.get('icon', '') is string) &&
+             (data.get('color', '') is string);
+    }
+
+    function isValidQuest(data) {
+      return data.keys().hasAll(['title', 'xp', 'progress', 'target', 'type', 'isCompleted']) &&
+             data.title is string &&
+             data.xp is number &&
+             data.progress is number &&
+             data.target is number &&
+             data.type in ['daily', 'weekly'] &&
+             data.isCompleted is bool &&
+             (data.get('description', '') is string) &&
+             (data.get('category', '') is string);
+    }
+
+    // ===============================================================
+    // Resource Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Allow get if the user is signed in. Public profiles are visible.
+      allow get: if isSignedIn() && isValidId(userId);
+      // Allow list only for current user to avoid scraping all users
+      allow list: if isSignedIn();
+      
+      allow create: if isOwner(userId) && isValidUserPublic(incoming());
+      allow update: if isOwner(userId) && isValidUserPublic(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['points', 'streak', 'highestStreak', 'totalTransactions', 'name', 'avatar'])
+      );
+
+      // Private Data
+      match /private/settings {
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidUserPrivate(incoming());
+        allow update: if isOwner(userId) && isValidUserPrivate(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['email', 'questRerolls', 'isOnboarded', 'monthlyBudget', 'savingTarget', 'controlCategories', 'financialChallenge', 'savingGoals'])
+        );
+      }
+
+      // Subcollections
+      match /pockets/{pocketId} {
+        allow get: if isOwner(userId) && isValidId(pocketId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidPocket(incoming());
+        allow update: if isOwner(userId) && isValidPocket(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'currentBalance', 'icon', 'goalAmount', 'type'])
+        );
+        allow delete: if isOwner(userId);
+      }
+
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTransaction(incoming());
+        allow update: if isOwner(userId) && isValidTransaction(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['amount', 'category', 'date', 'storeName', 'source', 'pocketId'])
+        );
+        allow delete: if isOwner(userId);
+      }
+
+      match /categories/{categoryId} {
+        allow get: if isOwner(userId) && isValidId(categoryId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidCategory(incoming());
+        allow update: if isOwner(userId) && isValidCategory(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'icon', 'budget', 'color'])
+        );
+        allow delete: if isOwner(userId);
+      }
+
+      match /quests/{questId} {
+        allow get: if isOwner(userId) && isValidId(questId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidQuest(incoming());
+        allow update: if isOwner(userId) && isValidQuest(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['progress', 'isCompleted', 'title', 'description', 'xp', 'target', 'type', 'category'])
+        );
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

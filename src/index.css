@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Duolingo Colors */
+  --color-dq-green: #58CC02;
+  --color-dq-green-hover: #6FEA12;
+  --color-dq-green-dark: #3A8D1E;
+  
+  /* Dynamic Palette */
+  --color-dq-bg: var(--dq-bg);
+  --color-dq-bg-secondary: var(--dq-bg-secondary);
+  --color-dq-card: var(--dq-card);
+  --color-dq-text: var(--dq-text);
+  --color-dq-text-secondary: var(--dq-text-secondary);
+  --color-dq-border: var(--dq-border);
+}
+
+@layer base {
+  :root {
+    --dq-bg: #F7FFF2;
+    --dq-bg-secondary: #EEF7E8;
+    --dq-card: #FFFFFF;
+    --dq-text: #3C3C3C;
+    --dq-text-secondary: #777777;
+    --dq-border: #E2E2D5;
+  }
+
+  .dark {
+    --dq-bg: #07190F;
+    --dq-bg-secondary: #0A2215;
+    --dq-card: #112B1B;
+    --dq-text: #FFFFFF;
+    --dq-text-secondary: #A5C2A6;
+    --dq-border: #1B3F28;
+  }
+
+  body {
+    @apply font-sans antialiased bg-dq-bg text-dq-text transition-colors duration-300;
+  }
+
+  * {
+    @apply transition-colors duration-300;
+  }
+}
+
+.bg-dq-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%2358CC02' fill-opacity='0.12'%3E$%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: bg-slide 60s linear infinite;
+}
+
+.dark .bg-dq-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%2358CC02' fill-opacity='0.06'%3E$%3C/text%3E%3C/svg%3E");
+}
+
+@keyframes bg-slide {
+  from { background-position: 0 0; }
+  to { background-position: 60px 60px; }
+}
+
+.snappy-transition {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #0F2E1D;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2A5C38;
+  border-radius: 10px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3A8D1E;
+}
