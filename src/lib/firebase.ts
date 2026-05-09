@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 console.log("Checking API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 const firebaseConfig = {
-  apiKey:process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  apiKey:process.env.VITE_FIREBASE_API_KEY,
   authDomain: "budgetquest-e2e34.firebaseapp.com",
   projectId: "budgetquest-e2e34",
   storageBucket: "budgetquest-e2e34.firebasestorage.app",
