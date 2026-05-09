@@ -1,13 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
-import.meta.env.VITE_FIREBASE_API_KEY
-console.log("Check 1 (Next):", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-console.log("Check 2 (Vite):", import.meta.env?.VITE_FIREBASE_API_KEY);
-console.log("Check 3 (All Env):", process.env);
-console.log("Checking API Key:", meta.env.VITE_FIREBASE_API_KEY);
 const firebaseConfig = {
-  apiKey:meta.env.VITE_FIREBASE_API_KEY,
+  // Use import.meta.env for Vite projects
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "budgetquest-e2e34.firebaseapp.com",
   projectId: "budgetquest-e2e34",
   storageBucket: "budgetquest-e2e34.firebasestorage.app",
