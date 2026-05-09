@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+console.log("Checking API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 const firebaseConfig = {
   apiKey:process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "budgetquest-e2e34.firebaseapp.com",
